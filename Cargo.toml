@@ -1,0 +1,52 @@
+[package]
+name = "openapi"
+version = "0.1.0"
+authors = ["OpenAPI Generator team and contributors"]
+description = "Generated from apidoc.js. NOT an official Proxmox specification. See https://pve.proxmox.com/pve-docs/api-viewer/ for the upstream documentation."
+license = "AGPL-3.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "^1.0", features = ["derive"] }
+serde_with = { version = "^3.8", default-features = false, features = ["base64", "std", "macros"] }
+serde_json = "^1.0"
+serde_repr = "^0.1"
+url = "^2.5"
+reqwest = { version = "^0.13", default-features = false, features = ["json", "multipart", "query", "form"] }
+
+
+# WebSocket helper dependencies. Pulled in only with `--features extras`.
+[dependencies.tokio]
+version = "^1.36"
+optional = true
+features = ["rt-multi-thread", "macros", "net", "time"]
+
+[dependencies.tokio-tungstenite]
+version = "^0.24"
+optional = true
+features = ["native-tls"]
+
+[dependencies.futures-util]
+version = "^0.3"
+optional = true
+
+[dependencies.thiserror]
+version = "^1.0"
+optional = true
+
+[dependencies.urlencoding]
+version = "^2.1"
+optional = true
+
+[dependencies.async-trait]
+version = "^0.1"
+optional = true
+
+[dependencies.native-tls]
+version = "^0.2"
+optional = true
+[features]
+extras = ["dep:tokio", "dep:tokio-tungstenite", "dep:futures-util", "dep:thiserror", "dep:urlencoding", "dep:async-trait", "dep:native-tls"]
+default = ["native-tls"]
+native-tls = ["reqwest/native-tls"]
+rustls = ["reqwest/rustls"]
