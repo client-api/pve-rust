@@ -12,11 +12,23 @@ Targets `reqwest` + `serde`. Requires Rust ≥ 1.75 (2021 edition).
 
 ## Install
 
+Published to [crates.io](https://crates.io/crates/clientapi-pve) on
+every GitHub release:
+
+```bash
+cargo add clientapi-pve
+```
+
+Or pin the version explicitly:
+
 ```toml
 # Cargo.toml
 [dependencies]
- = { git = "https://github.com/client-api/pve-rust.git", tag = "v0.1.0" }
+clientapi-pve = "*"
 ```
+
+The import path is the snake_case form of the crate name, e.g.
+`use clientapi_pve::apis::nodes_api;`.
 
 ## Usage
 
@@ -25,19 +37,19 @@ struct facade because Rust modules don't bind to method receivers.
 Instead, hold a `Configuration` and pass it into each call:
 
 ```rust
-use ::apis::{configuration::Configuration, qemu_api, nodes_api};
+use clientapi_pve::apis::{configuration::Configuration, qemu_api, nodes_api};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut cfg = Configuration::new();
     cfg.base_path = "https://pve1.example.com:8006/api2/json".into();
-    cfg.api_key = Some(openapi::apis::configuration::ApiKey {
+    cfg.api_key = Some(clientapi_pve::apis::configuration::ApiKey {
         prefix: None,
         key: "PVEAPIToken=user@realm!tokenid=uuid-secret".into(),
     });
 
     let status = qemu_api::qemu_vm_status(&cfg, "pve1", 100).await?;
-    let nodes  = nodes_api::nodes_index(&cfg).await?;
+    let nodes  = nodes_api::nodes_get_nodes(&cfg).await?;
     println!("{:?}", status);
     Ok(())
 }
@@ -50,7 +62,7 @@ PVE encodes many fields as CLI-style shorthand strings
 emitted for every compound config schema:
 
 ```rust
-use ::models::PveQemuNetConfig;
+use clientapi_pve::models::PveQemuNetConfig;
 
 let cfg = PveQemuNetConfig {
     model: "virtio".into(),
