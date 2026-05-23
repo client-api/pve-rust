@@ -1,12 +1,12 @@
 # pve-rust
 
-Rust SDK for the Proxmox Virtual Environment (PVE) API. Generated
-from the upstream `apidoc.js` via [openapi-generator-cli][gen] with
+Rust SDK for the Proxmox Virtual Environment API. Generated
+from the upstream `apidoc.js` from Proxmox VE via [openapi-generator-cli][gen] with
 custom Mustache template overrides.
 
 > **Not an official Proxmox project.** Community SDK derived from the
-> upstream `apidoc.js`. Always verify against
-> <https://pve.proxmox.com/pve-docs/api-viewer/>.
+> upstream `apidoc.js`. Always verify against the upstream API viewer.
+> <https://pve.proxmox.com/>.
 
 Targets `reqwest` + `serde`. Requires Rust ≥ 1.75 (2021 edition).
 
