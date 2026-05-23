@@ -134,6 +134,7 @@ pub mod cluster_mapping_api;
 pub mod cluster_metrics_api;
 pub mod cluster_notifications_api;
 pub mod cluster_options_api;
+pub mod cluster_qemu_api;
 pub mod cluster_replication_api;
 pub mod cluster_sdn_api;
 pub mod lxc_api;
