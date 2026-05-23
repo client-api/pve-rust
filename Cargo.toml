@@ -1,5 +1,5 @@
 [package]
-name = "openapi"
+name = "clientapi-pve"
 version = "0.1.0"
 authors = ["OpenAPI Generator team and contributors"]
 description = "Generated from apidoc.js. NOT an official Proxmox specification. See https://pve.proxmox.com/pve-docs/api-viewer/ for the upstream documentation."
