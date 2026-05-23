@@ -18,10 +18,6 @@ pub struct NodesMigrateallRequest {
     #[serde(rename = "max-workers", skip_serializing_if = "Option::is_none")]
     pub max_workers: Option<i32>,
 
-    /// Maximal number of parallel migration job. If not set, uses'max_workers' from datacenter.cfg. One of both must be set!Deprecated, use 'max-workers' instead.
-    #[serde(rename = "maxworkers", skip_serializing_if = "Option::is_none")]
-    pub maxworkers: Option<i32>,
-
     /// Target node.
     #[serde(rename = "target")]
     pub target: String,
@@ -42,8 +38,6 @@ impl NodesMigrateallRequest {
         NodesMigrateallRequest {
             
             max_workers: None,
-            
-            maxworkers: None,
             
             target,
             

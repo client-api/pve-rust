@@ -18,10 +18,6 @@ pub struct ClusterBulkActionStartRequest {
     #[serde(rename = "max-workers", skip_serializing_if = "Option::is_none")]
     pub max_workers: Option<i32>,
 
-    /// Defines the maximum number of tasks running concurrently. Deprecated, use 'max-workers' instead.
-    #[serde(rename = "maxworkers", skip_serializing_if = "Option::is_none")]
-    pub maxworkers: Option<i32>,
-
     /// Default start timeout in seconds. Only valid for VMs. (default depends on the guest configuration).
     #[serde(rename = "timeout", skip_serializing_if = "Option::is_none")]
     pub timeout: Option<i64>,
@@ -38,8 +34,6 @@ impl ClusterBulkActionStartRequest {
         ClusterBulkActionStartRequest {
             
             max_workers: None,
-            
-            maxworkers: None,
             
             timeout: None,
             

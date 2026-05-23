@@ -18,10 +18,6 @@ pub struct ClusterBulkActionMigrateRequest {
     #[serde(rename = "max-workers", skip_serializing_if = "Option::is_none")]
     pub max_workers: Option<i32>,
 
-    /// Defines the maximum number of tasks running concurrently. Deprecated, use 'max-workers' instead.
-    #[serde(rename = "maxworkers", skip_serializing_if = "Option::is_none")]
-    pub maxworkers: Option<i32>,
-
     /// Enable live migration for VMs and restart migration for CTs.
     #[serde(rename = "online", skip_serializing_if = "Option::is_none")]
     pub online: Option<models::PveBoolean>,
@@ -46,8 +42,6 @@ impl ClusterBulkActionMigrateRequest {
         ClusterBulkActionMigrateRequest {
             
             max_workers: None,
-            
-            maxworkers: None,
             
             online: None,
             

@@ -78,10 +78,6 @@ pub struct ClusterOptionsSetOptionsRequest {
     #[serde(rename = "migration", skip_serializing_if = "Option::is_none")]
     pub migration: Option<Box<models::PveMigrationField>>,
 
-    /// Migration is secure using SSH tunnel by default. For secure private networks you can disable it to speed up migration. Deprecated, use the 'migration' property instead!
-    #[serde(rename = "migration_unsecure", skip_serializing_if = "Option::is_none")]
-    pub migration_unsecure: Option<models::PveBoolean>,
-
     /// Control the range for the free VMID auto-selection pool.
     #[serde(rename = "next-id", skip_serializing_if = "Option::is_none")]
     pub next_id: Option<Box<models::PveNextIdField>>,
@@ -152,8 +148,6 @@ impl ClusterOptionsSetOptionsRequest {
             max_workers: None,
             
             migration: None,
-            
-            migration_unsecure: None,
             
             next_id: None,
             
