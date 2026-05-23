@@ -12,9 +12,9 @@
 use std::env;
 use std::time::Duration;
 
-use openapi::apis::configuration::Configuration;
-use openapi::websocket::TerminalTarget;
-use openapi::websocket_resilient::{connect_terminal_resilient, RetryOptions};
+use clientapi_pve::apis::configuration::Configuration;
+use clientapi_pve::websocket::TerminalTarget;
+use clientapi_pve::websocket_resilient::{connect_terminal_resilient, RetryOptions};
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

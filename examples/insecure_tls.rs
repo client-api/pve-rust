@@ -20,9 +20,9 @@
 use std::env;
 use std::time::Duration;
 
-use openapi::apis::configuration::Configuration;
-use openapi::apis::nodes_api;
-use openapi::websocket::{
+use clientapi_pve::apis::configuration::Configuration;
+use clientapi_pve::apis::nodes_api;
+use clientapi_pve::websocket::{
     AuthAttacher, ConsoleConnector, TerminalSession, TerminalTarget, WebSocketTransport, WsError,
     WsStream,
 };

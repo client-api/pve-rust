@@ -12,8 +12,8 @@
 use std::env;
 use std::time::Duration;
 
-use openapi::apis::configuration::Configuration;
-use openapi::websocket::{connect_terminal, TerminalTarget};
+use clientapi_pve::apis::configuration::Configuration;
+use clientapi_pve::websocket::{connect_terminal, TerminalTarget};
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

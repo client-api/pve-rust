@@ -8,8 +8,8 @@
 //! cargo run --example list_nodes
 //! ```
 
-use openapi::apis::configuration::Configuration;
-use openapi::apis::nodes_api;
+use clientapi_pve::apis::configuration::Configuration;
+use clientapi_pve::apis::nodes_api;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
