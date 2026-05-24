@@ -41,7 +41,12 @@ jobs:
       # what we want here — crates.io versions are immutable, so a
       # broken upload is irreversible. `--locked` is skipped because
       # this is a library crate and Cargo.lock isn't committed.
+      #
+      # `--allow-dirty` is required because the preceding step rewrites
+      # `Cargo.toml` (version from tag) without committing — the tag
+      # itself is the authoritative version record, so we don't bother
+      # committing a one-shot publish-time edit back to the SDK repo.
       - name: Publish to crates.io
-        run: cargo publish
+        run: cargo publish --allow-dirty
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
