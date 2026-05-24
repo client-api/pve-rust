@@ -14,6 +14,18 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveSdnZoneQinqConfig {
 
+    /// the token for unlocking the global SDN configuration
+    #[serde(rename = "lock-token", skip_serializing_if = "Option::is_none")]
+    pub lock_token: Option<String>,
+
+    /// Additional controllers.
+    #[serde(rename = "secondary-controllers", skip_serializing_if = "Option::is_none")]
+    pub secondary_controllers: Option<Vec<String>>,
+
+    /// The SDN zone object identifier.
+    #[serde(rename = "zone")]
+    pub zone: String,
+
     /// List of cluster node names.
     #[serde(rename = "nodes", skip_serializing_if = "Option::is_none")]
     pub nodes: Option<String>,
@@ -61,8 +73,14 @@ pub struct PveSdnZoneQinqConfig {
 }
 
 impl PveSdnZoneQinqConfig {
-    pub fn new(tag: i64, bridge: String, r#type: Type) -> PveSdnZoneQinqConfig {
+    pub fn new(zone: String, tag: i64, bridge: String, r#type: Type) -> PveSdnZoneQinqConfig {
         PveSdnZoneQinqConfig {
+            
+            lock_token: None,
+            
+            secondary_controllers: None,
+            
+            zone,
             
             nodes: None,
             

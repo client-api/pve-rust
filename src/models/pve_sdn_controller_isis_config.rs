@@ -14,6 +14,34 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveSdnControllerIsisConfig {
 
+    /// Whether to use eBGP or iBGP. Auto mode chooses depending on BGP controller or falls back to iBGP.
+    #[serde(rename = "bgp-mode", skip_serializing_if = "Option::is_none")]
+    pub bgp_mode: Option<models::PveBgpModeEnum>,
+
+    /// The SDN controller object identifier.
+    #[serde(rename = "controller")]
+    pub controller: String,
+
+    /// the token for unlocking the global SDN configuration
+    #[serde(rename = "lock-token", skip_serializing_if = "Option::is_none")]
+    pub lock_token: Option<String>,
+
+    /// List of cluster node names.
+    #[serde(rename = "nodes", skip_serializing_if = "Option::is_none")]
+    pub nodes: Option<String>,
+
+    /// Name of the peer group for this EVPN controller
+    #[serde(rename = "peer-group-name", skip_serializing_if = "Option::is_none")]
+    pub peer_group_name: Option<String>,
+
+    /// Route Map that should be applied for incoming routes
+    #[serde(rename = "route-map-in", skip_serializing_if = "Option::is_none")]
+    pub route_map_in: Option<String>,
+
+    /// Route Map that should be applied for outgoing routes
+    #[serde(rename = "route-map-out", skip_serializing_if = "Option::is_none")]
+    pub route_map_out: Option<String>,
+
     /// Name of the IS-IS domain.
     #[serde(rename = "isis-domain")]
     pub isis_domain: String,
@@ -41,8 +69,22 @@ pub struct PveSdnControllerIsisConfig {
 }
 
 impl PveSdnControllerIsisConfig {
-    pub fn new(isis_domain: String, isis_net: String, isis_ifaces: String, node: String, r#type: Type) -> PveSdnControllerIsisConfig {
+    pub fn new(controller: String, isis_domain: String, isis_net: String, isis_ifaces: String, node: String, r#type: Type) -> PveSdnControllerIsisConfig {
         PveSdnControllerIsisConfig {
+            
+            bgp_mode: None,
+            
+            controller,
+            
+            lock_token: None,
+            
+            nodes: None,
+            
+            peer_group_name: None,
+            
+            route_map_in: None,
+            
+            route_map_out: None,
             
             isis_domain,
             

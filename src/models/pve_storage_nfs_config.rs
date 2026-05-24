@@ -14,6 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveStorageNfsConfig {
 
+    /// Authsupported.
+    #[serde(rename = "authsupported", skip_serializing_if = "Option::is_none")]
+    pub authsupported: Option<String>,
+
+    /// The storage identifier.
+    #[serde(rename = "storage")]
+    pub storage: String,
+
     /// File system path.
     #[serde(rename = "path")]
     pub path: String,
@@ -89,8 +97,12 @@ pub struct PveStorageNfsConfig {
 }
 
 impl PveStorageNfsConfig {
-    pub fn new(path: String, server: String, export: String, r#type: Type) -> PveStorageNfsConfig {
+    pub fn new(storage: String, path: String, server: String, export: String, r#type: Type) -> PveStorageNfsConfig {
         PveStorageNfsConfig {
+            
+            authsupported: None,
+            
+            storage,
             
             path,
             

@@ -1868,8 +1868,6 @@ pub mod nodes_storage_updateattributes_request;
 pub use self::nodes_storage_updateattributes_request::NodesStorageUpdateattributesRequest;
 pub mod nodes_storage_updateattributes_response;
 pub use self::nodes_storage_updateattributes_response::NodesStorageUpdateattributesResponse;
-pub mod nodes_storage_upload_request;
-pub use self::nodes_storage_upload_request::NodesStorageUploadRequest;
 pub mod nodes_storage_upload_response;
 pub use self::nodes_storage_upload_response::NodesStorageUploadResponse;
 pub mod nodes_subscription_create_subscription_request;

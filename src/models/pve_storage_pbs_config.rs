@@ -14,6 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveStoragePbsConfig {
 
+    /// Authsupported.
+    #[serde(rename = "authsupported", skip_serializing_if = "Option::is_none")]
+    pub authsupported: Option<String>,
+
+    /// The storage identifier.
+    #[serde(rename = "storage")]
+    pub storage: String,
+
     /// Server IP or DNS name.
     #[serde(rename = "server")]
     pub server: String,
@@ -77,8 +85,12 @@ pub struct PveStoragePbsConfig {
 }
 
 impl PveStoragePbsConfig {
-    pub fn new(server: String, datastore: String, r#type: Type) -> PveStoragePbsConfig {
+    pub fn new(storage: String, server: String, datastore: String, r#type: Type) -> PveStoragePbsConfig {
         PveStoragePbsConfig {
+            
+            authsupported: None,
+            
+            storage,
             
             server,
             

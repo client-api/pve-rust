@@ -14,6 +14,18 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveSdnZoneFaucetConfig {
 
+    /// the token for unlocking the global SDN configuration
+    #[serde(rename = "lock-token", skip_serializing_if = "Option::is_none")]
+    pub lock_token: Option<String>,
+
+    /// Additional controllers.
+    #[serde(rename = "secondary-controllers", skip_serializing_if = "Option::is_none")]
+    pub secondary_controllers: Option<Vec<String>>,
+
+    /// The SDN zone object identifier.
+    #[serde(rename = "zone")]
+    pub zone: String,
+
     /// List of cluster node names.
     #[serde(rename = "nodes", skip_serializing_if = "Option::is_none")]
     pub nodes: Option<String>,
@@ -49,8 +61,14 @@ pub struct PveSdnZoneFaucetConfig {
 }
 
 impl PveSdnZoneFaucetConfig {
-    pub fn new(dp_id: i64, controller: String, r#type: Type) -> PveSdnZoneFaucetConfig {
+    pub fn new(zone: String, dp_id: i64, controller: String, r#type: Type) -> PveSdnZoneFaucetConfig {
         PveSdnZoneFaucetConfig {
+            
+            lock_token: None,
+            
+            secondary_controllers: None,
+            
+            zone,
             
             nodes: None,
             

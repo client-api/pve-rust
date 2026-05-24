@@ -14,6 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveSdnIpamPveConfig {
 
+    /// The SDN ipam object identifier.
+    #[serde(rename = "ipam")]
+    pub ipam: String,
+
+    /// the token for unlocking the global SDN configuration
+    #[serde(rename = "lock-token", skip_serializing_if = "Option::is_none")]
+    pub lock_token: Option<String>,
+
     #[serde(rename = "type")]
     pub r#type: Type,
 
@@ -21,8 +29,12 @@ pub struct PveSdnIpamPveConfig {
 }
 
 impl PveSdnIpamPveConfig {
-    pub fn new(r#type: Type) -> PveSdnIpamPveConfig {
+    pub fn new(ipam: String, r#type: Type) -> PveSdnIpamPveConfig {
         PveSdnIpamPveConfig {
+            
+            ipam,
+            
+            lock_token: None,
             
             r#type,
             

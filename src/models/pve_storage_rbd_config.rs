@@ -14,6 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveStorageRbdConfig {
 
+    /// Authsupported.
+    #[serde(rename = "authsupported", skip_serializing_if = "Option::is_none")]
+    pub authsupported: Option<String>,
+
+    /// The storage identifier.
+    #[serde(rename = "storage")]
+    pub storage: String,
+
     /// List of nodes for which the storage configuration applies.
     #[serde(rename = "nodes", skip_serializing_if = "Option::is_none")]
     pub nodes: Option<String>,
@@ -65,8 +73,12 @@ pub struct PveStorageRbdConfig {
 }
 
 impl PveStorageRbdConfig {
-    pub fn new(r#type: Type) -> PveStorageRbdConfig {
+    pub fn new(storage: String, r#type: Type) -> PveStorageRbdConfig {
         PveStorageRbdConfig {
+            
+            authsupported: None,
+            
+            storage,
             
             nodes: None,
             

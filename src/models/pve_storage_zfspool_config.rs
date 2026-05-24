@@ -14,6 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveStorageZfspoolConfig {
 
+    /// Authsupported.
+    #[serde(rename = "authsupported", skip_serializing_if = "Option::is_none")]
+    pub authsupported: Option<String>,
+
+    /// The storage identifier.
+    #[serde(rename = "storage")]
+    pub storage: String,
+
     /// Pool.
     #[serde(rename = "pool")]
     pub pool: String,
@@ -53,8 +61,12 @@ pub struct PveStorageZfspoolConfig {
 }
 
 impl PveStorageZfspoolConfig {
-    pub fn new(pool: String, r#type: Type) -> PveStorageZfspoolConfig {
+    pub fn new(storage: String, pool: String, r#type: Type) -> PveStorageZfspoolConfig {
         PveStorageZfspoolConfig {
+            
+            authsupported: None,
+            
+            storage,
             
             pool,
             

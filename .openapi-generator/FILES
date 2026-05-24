@@ -996,7 +996,6 @@ src/models/nodes_storage_rrd_response.rs
 src/models/nodes_storage_rrddata_response.rs
 src/models/nodes_storage_updateattributes_request.rs
 src/models/nodes_storage_updateattributes_response.rs
-src/models/nodes_storage_upload_request.rs
 src/models/nodes_storage_upload_response.rs
 src/models/nodes_subscription_create_subscription_request.rs
 src/models/nodes_subscription_create_subscription_response.rs

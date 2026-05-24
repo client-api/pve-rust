@@ -14,6 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveStorageLvmthinConfig {
 
+    /// Authsupported.
+    #[serde(rename = "authsupported", skip_serializing_if = "Option::is_none")]
+    pub authsupported: Option<String>,
+
+    /// The storage identifier.
+    #[serde(rename = "storage")]
+    pub storage: String,
+
     /// LVM thin pool LV name.
     #[serde(rename = "thinpool")]
     pub thinpool: String,
@@ -45,8 +53,12 @@ pub struct PveStorageLvmthinConfig {
 }
 
 impl PveStorageLvmthinConfig {
-    pub fn new(thinpool: String, vgname: String, r#type: Type) -> PveStorageLvmthinConfig {
+    pub fn new(storage: String, thinpool: String, vgname: String, r#type: Type) -> PveStorageLvmthinConfig {
         PveStorageLvmthinConfig {
+            
+            authsupported: None,
+            
+            storage,
             
             thinpool,
             

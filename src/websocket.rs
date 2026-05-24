@@ -473,7 +473,17 @@ impl ConsoleConnector {
         // first frame after the WS handshake. tokio_tungstenite's
         // `connect_async` returns once the upgrade is complete, so
         // the stream is ready to write here — push the auth inline.
-        let auth_frame = format!("{}:{}\n", ticket.user, ticket.ticket);
+        // Some products (PDM) reject the bare user form on the WS
+        // handshake and require `<user>@<realm>`. defaultRealm is
+        // product-defined; PVE leaves it empty so the ticket-issued
+        // user passes through.
+        const DEFAULT_REALM: &str = "";
+        let user: String = if DEFAULT_REALM.is_empty() || ticket.user.contains('@') {
+            ticket.user.clone()
+        } else {
+            format!("{}@{}", ticket.user, DEFAULT_REALM)
+        };
+        let auth_frame = format!("{}:{}\n", user, ticket.ticket);
         SinkExt::send(&mut stream, Message::Text(auth_frame.into())).await?;
         Ok(TerminalSession {
             stream,

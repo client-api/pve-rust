@@ -14,6 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveStorageCephfsConfig {
 
+    /// Authsupported.
+    #[serde(rename = "authsupported", skip_serializing_if = "Option::is_none")]
+    pub authsupported: Option<String>,
+
+    /// The storage identifier.
+    #[serde(rename = "storage")]
+    pub storage: String,
+
     /// File system path.
     #[serde(rename = "path")]
     pub path: String,
@@ -97,8 +105,12 @@ pub struct PveStorageCephfsConfig {
 }
 
 impl PveStorageCephfsConfig {
-    pub fn new(path: String, r#type: Type) -> PveStorageCephfsConfig {
+    pub fn new(storage: String, path: String, r#type: Type) -> PveStorageCephfsConfig {
         PveStorageCephfsConfig {
+            
+            authsupported: None,
+            
+            storage,
             
             path,
             

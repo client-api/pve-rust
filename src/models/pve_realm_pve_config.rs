@@ -14,6 +14,18 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveRealmPveConfig {
 
+    /// A list of audiences that the OpenID Issuer may include that are accepted in addition to 'client-id'.
+    #[serde(rename = "audiences", skip_serializing_if = "Option::is_none")]
+    pub audiences: Option<String>,
+
+    /// Check bind connection to the server.
+    #[serde(rename = "check-connection", skip_serializing_if = "Option::is_none")]
+    pub check_connection: Option<models::PveBoolean>,
+
+    /// Authentication domain ID
+    #[serde(rename = "realm")]
+    pub realm: String,
+
     /// Use this as default realm
     #[serde(rename = "default", skip_serializing_if = "Option::is_none")]
     pub default: Option<models::PveBoolean>,
@@ -33,8 +45,14 @@ pub struct PveRealmPveConfig {
 }
 
 impl PveRealmPveConfig {
-    pub fn new(r#type: Type) -> PveRealmPveConfig {
+    pub fn new(realm: String, r#type: Type) -> PveRealmPveConfig {
         PveRealmPveConfig {
+            
+            audiences: None,
+            
+            check_connection: None,
+            
+            realm,
             
             default: None,
             

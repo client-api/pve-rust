@@ -14,6 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PveStorageIscsiConfig {
 
+    /// Authsupported.
+    #[serde(rename = "authsupported", skip_serializing_if = "Option::is_none")]
+    pub authsupported: Option<String>,
+
+    /// The storage identifier.
+    #[serde(rename = "storage")]
+    pub storage: String,
+
     /// iSCSI portal (IP or DNS name with optional port).
     #[serde(rename = "portal")]
     pub portal: String,
@@ -45,8 +53,12 @@ pub struct PveStorageIscsiConfig {
 }
 
 impl PveStorageIscsiConfig {
-    pub fn new(portal: String, target: String, r#type: Type) -> PveStorageIscsiConfig {
+    pub fn new(storage: String, portal: String, target: String, r#type: Type) -> PveStorageIscsiConfig {
         PveStorageIscsiConfig {
+            
+            authsupported: None,
+            
+            storage,
             
             portal,
             

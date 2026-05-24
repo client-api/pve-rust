@@ -13,6 +13,8 @@ use reqwest;
 use serde::{Deserialize, Serialize, de::Error as _};
 use crate::{apis::ResponseContent, models};
 use super::{Error, configuration, ContentType};
+use tokio::fs::File as TokioFile;
+use tokio_util::codec::{BytesCodec, FramedRead};
 
 
 /// struct for typed errors of method [`nodes_storage_copy`]
@@ -1420,11 +1422,14 @@ pub async fn nodes_storage_updateattributes(configuration: &configuration::Confi
 }
 
 /// Upload templates, ISO images, OVAs and VM images.
-pub async fn nodes_storage_upload(configuration: &configuration::Configuration, node: &str, storage: &str, nodes_storage_upload_request: models::NodesStorageUploadRequest) -> Result<models::NodesStorageUploadResponse, Error<NodesStorageUploadError>> {
+pub async fn nodes_storage_upload(configuration: &configuration::Configuration, node: &str, storage: &str, content: models::PveContentEnum, filename: std::path::PathBuf, checksum: Option<&str>, checksum_algorithm: Option<models::PveChecksumAlgorithmEnum>) -> Result<models::NodesStorageUploadResponse, Error<NodesStorageUploadError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_node = node;
     let p_path_storage = storage;
-    let p_body_nodes_storage_upload_request = nodes_storage_upload_request;
+    let p_form_content = content;
+    let p_form_filename = filename;
+    let p_form_checksum = checksum;
+    let p_form_checksum_algorithm = checksum_algorithm;
 
     let uri_str = format!("{}/nodes/{node}/storage/{storage}/upload", configuration.base_path, node=crate::apis::urlencode(p_path_node), storage=crate::apis::urlencode(p_path_storage));
     let mut req_builder = configuration.client.request(reqwest::Method::POST, &uri_str);
@@ -1448,7 +1453,20 @@ pub async fn nodes_storage_upload(configuration: &configuration::Configuration, 
         };
         req_builder = req_builder.header("CSRFPreventionToken", value);
     };
-    req_builder = req_builder.json(&p_body_nodes_storage_upload_request);
+    let mut multipart_form = reqwest::multipart::Form::new();
+    if let Some(param_value) = p_form_checksum {
+        multipart_form = multipart_form.text("checksum", param_value.to_string());
+    }
+    if let Some(param_value) = p_form_checksum_algorithm {
+        multipart_form = multipart_form.text("checksum-algorithm", serde_json::to_string(&param_value)?);
+    }
+    multipart_form = multipart_form.text("content", p_form_content.to_string());
+    let file = TokioFile::open(&p_form_filename).await?;
+    let stream = FramedRead::new(file, BytesCodec::new());
+    let file_name = p_form_filename.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
+    let file_part = reqwest::multipart::Part::stream(reqwest::Body::wrap_stream(stream)).file_name(file_name);
+    multipart_form = multipart_form.part("filename", file_part);
+    req_builder = req_builder.multipart(multipart_form);
 
     let req = req_builder.build()?;
     let resp = configuration.client.execute(req).await?;
