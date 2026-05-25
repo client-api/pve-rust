@@ -1,0 +1,39 @@
+name: E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: proxmox
+        uses: client-api/proxmox-docker-action@v1
+        with:
+          product: pve
+          tag: '9.2'
+
+      - name: Run E2E tests
+        run: cargo test --tests -- --nocapture
+        env:
+          PROXMOX_KVM_AVAILABLE: ${{ steps.proxmox.outputs.kvm-available }}
+          PROXMOX_CGROUPV2_AVAILABLE: ${{ steps.proxmox.outputs.cgroupv2-available }}

@@ -21,3 +21,33 @@
 #docs/*.md
 # Then explicitly reverse the ignore rule for a single file:
 #!docs/README.md
+
+# E2E test suite (Phase 4 of the SDK rollout) — hand-written, must
+# survive `pnpm sdk:pve-rust` + sdk-sync. Each path here mirrors a file
+# committed under tests/, .github/, or the repo root.
+tests/common/
+tests/common/**
+tests/version.rs
+tests/auth.rs
+tests/authz.rs
+tests/crud.rs
+tests/iso_upload.rs
+tests/errors.rs
+tests/types.rs
+tests/vm_lifecycle.rs
+tests/vm_cdrom.rs
+tests/ct_lifecycle.rs
+
+# Local-dev container + CI workflow for E2E.
+.github/workflows/e2e.yml
+docker-compose.yml
+
+# Self — the ignore file itself is hand-edited from a generator template.
+.openapi-generator-ignore
+
+# Cargo.toml is hand-edited to keep a [dev-dependencies] section for the
+# E2E suite. The generator emits no dev-deps, so a regen erases them.
+# Until the rust template supports a downstream dev-deps merge, the file
+# is owned downstream. If you bump a generator-managed runtime dep,
+# port the change manually into this file.
+Cargo.toml

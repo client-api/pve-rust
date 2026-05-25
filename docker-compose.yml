@@ -1,0 +1,28 @@
+# Local-dev convenience for running the E2E suite without GitHub Actions.
+# CI uses client-api/proxmox-docker-action@v1 instead and ignores this file.
+#
+# Bring it up:   docker compose up -d
+# Tear it down:  docker compose down
+#
+# Credentials are written to /run/credentials.json inside the container by
+# the image entrypoint; on host, exec into the container to read them:
+#   docker exec pve-test cat /run/credentials.json
+# Then export the relevant fields as PROXMOX_* env vars and run
+# `cargo test --tests`.
+
+services:
+  pve-test:
+    image: ghcr.io/client-api/proxmox-docker/pve-test:9.2
+    container_name: pve-test
+    hostname: pve-test
+    privileged: true
+    cgroup: host
+    devices:
+      - /dev/kvm:/dev/kvm
+    ports:
+      - "8006:8006"
+    tmpfs:
+      - /tmp
+      - /run
+    stop_signal: SIGRTMIN+3
+    stop_grace_period: 10s
