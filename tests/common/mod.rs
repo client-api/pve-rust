@@ -9,9 +9,11 @@ pub mod credentials;
 pub mod fixtures;
 pub mod iso;
 pub mod poll;
+pub mod raw_status;
 
 pub use capability_gate::*;
 pub use credentials::*;
 pub use fixtures::*;
 pub use iso::*;
 pub use poll::*;
+pub use raw_status::*;

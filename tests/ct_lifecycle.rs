@@ -9,7 +9,6 @@ mod common;
 use std::time::Duration;
 
 use clientapi_pve::apis::lxc_api;
-use clientapi_pve::models::PveStatusEnum;
 use common::*;
 
 const FIXTURE_CTID: i32 = 200;
@@ -31,41 +30,44 @@ async fn sc_61_ct_lifecycle() {
     }
 
     let _ = lxc_api::lxc_vm_stop(&cfg, &node, FIXTURE_CTID, None).await;
-    wait_for_status(&cfg, &node, FIXTURE_CTID, PveStatusEnum::Stopped, 30)
+    wait_for_status(&creds, &node, FIXTURE_CTID, "stopped", 30)
         .await
         .expect("CT stopped at start");
 
     lxc_api::lxc_vm_start(&cfg, &node, FIXTURE_CTID, None)
         .await
         .expect("pct start 200");
-    wait_for_status(&cfg, &node, FIXTURE_CTID, PveStatusEnum::Running, 60)
+    wait_for_status(&creds, &node, FIXTURE_CTID, "running", 60)
         .await
         .expect("CT running within 60 s");
 
     lxc_api::lxc_vm_stop(&cfg, &node, FIXTURE_CTID, None)
         .await
         .expect("pct stop 200");
-    wait_for_status(&cfg, &node, FIXTURE_CTID, PveStatusEnum::Stopped, 60)
+    wait_for_status(&creds, &node, FIXTURE_CTID, "stopped", 60)
         .await
         .expect("CT stopped within 60 s");
 }
 
 async fn wait_for_status(
-    cfg: &clientapi_pve::apis::configuration::Configuration,
+    creds: &Credentials,
     node: &str,
     vmid: i32,
-    expected: PveStatusEnum,
+    expected: &str,
     timeout_secs: u64,
 ) -> anyhow::Result<()> {
+    // Raw GET instead of the SDK's lxc_vm_status — the response model has
+    // f64 fields (cpu, pressure*) that PVE wires as JSON strings ("0.00"),
+    // making serde reject every poll. See common/raw_status.rs.
     wait_until(
-        &format!("ct {vmid} → {expected:?}"),
+        &format!("ct {vmid} → {expected}"),
         Duration::from_secs(timeout_secs),
         Duration::from_millis(500),
         || async {
-            let resp = lxc_api::lxc_vm_status(cfg, node, vmid)
+            let status = raw_status(creds, node, "lxc", vmid)
                 .await
                 .map_err(|e| anyhow::anyhow!("ct_status: {e}"))?;
-            if resp.data.status == expected {
+            if status == expected {
                 Ok(Some(()))
             } else {
                 Ok(None)

@@ -9,7 +9,7 @@ mod common;
 use std::time::Duration;
 
 use clientapi_pve::apis::qemu_api;
-use clientapi_pve::models::{PveBoolean, PveStatusEnum, QemuVmShutdownRequest};
+use clientapi_pve::models::{PveBoolean, QemuVmShutdownRequest};
 use common::*;
 
 const FIXTURE_VMID: i32 = 100;
@@ -36,7 +36,7 @@ async fn sc_60_vm_lifecycle() {
     // 2. Establish starting state. Force-stop best-effort so the test is
     //    re-runnable after an aborted run.
     let _ = qemu_api::qemu_vm_stop(&cfg, &node, FIXTURE_VMID, None).await;
-    wait_for_status(&cfg, &node, FIXTURE_VMID, PveStatusEnum::Stopped, 30)
+    wait_for_status(&creds, &node, FIXTURE_VMID, "stopped", 30)
         .await
         .expect("VM stopped at start");
 
@@ -44,7 +44,7 @@ async fn sc_60_vm_lifecycle() {
     qemu_api::qemu_vm_start(&cfg, &node, FIXTURE_VMID, None)
         .await
         .expect("qm start 100");
-    wait_for_status(&cfg, &node, FIXTURE_VMID, PveStatusEnum::Running, 30)
+    wait_for_status(&creds, &node, FIXTURE_VMID, "running", 30)
         .await
         .expect("VM running within 30 s");
 
@@ -66,27 +66,30 @@ async fn sc_60_vm_lifecycle() {
     .await
     .expect("qm shutdown 100 with force_stop=1");
 
-    wait_for_status(&cfg, &node, FIXTURE_VMID, PveStatusEnum::Stopped, 60)
+    wait_for_status(&creds, &node, FIXTURE_VMID, "stopped", 60)
         .await
         .expect("VM stopped within 60 s");
 }
 
 async fn wait_for_status(
-    cfg: &clientapi_pve::apis::configuration::Configuration,
+    creds: &Credentials,
     node: &str,
     vmid: i32,
-    expected: PveStatusEnum,
+    expected: &str,
     timeout_secs: u64,
 ) -> anyhow::Result<()> {
+    // Raw GET instead of the SDK's qemu_vm_status — the response model
+    // has f64 fields (cpu, pressure*) that PVE wires as JSON strings
+    // ("0.00"). See common/raw_status.rs for the filed-upstream bug.
     wait_until(
-        &format!("vm {vmid} → {expected:?}"),
+        &format!("vm {vmid} → {expected}"),
         Duration::from_secs(timeout_secs),
         Duration::from_millis(500),
         || async {
-            let resp = qemu_api::qemu_vm_status(cfg, node, vmid)
+            let status = raw_status(creds, node, "qemu", vmid)
                 .await
                 .map_err(|e| anyhow::anyhow!("vm_status: {e}"))?;
-            if resp.data.status == expected {
+            if status == expected {
                 Ok(Some(()))
             } else {
                 Ok(None)

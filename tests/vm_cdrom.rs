@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use clientapi_pve::apis::{nodes_storage_api, qemu_api};
 use clientapi_pve::models::{
-    PveBiosEnum, PveBoolean, PveContentEnum, PveIdeField, PveMemoryField, PveStatusEnum,
+    PveBiosEnum, PveBoolean, PveContentEnum, PveIdeField, PveMemoryField,
     QemuCreateVmRequest, QemuVmShutdownRequest,
 };
 use common::*;
@@ -84,7 +84,7 @@ async fn sc_62_vm_cdrom_boot_lifecycle() {
     qemu_api::qemu_vm_start(&cfg, &node, CDROM_VMID, None)
         .await
         .expect("start cdrom VM");
-    wait_for_status(&cfg, &node, CDROM_VMID, PveStatusEnum::Running, 30)
+    wait_for_status(&creds, &node, CDROM_VMID, "running", 30)
         .await
         .expect("cdrom VM running");
 
@@ -102,7 +102,7 @@ async fn sc_62_vm_cdrom_boot_lifecycle() {
     )
     .await
     .expect("shutdown cdrom VM with force_stop=1");
-    wait_for_status(&cfg, &node, CDROM_VMID, PveStatusEnum::Stopped, 60)
+    wait_for_status(&creds, &node, CDROM_VMID, "stopped", 60)
         .await
         .expect("cdrom VM stopped within 60 s");
 
@@ -115,21 +115,22 @@ async fn sc_62_vm_cdrom_boot_lifecycle() {
 }
 
 async fn wait_for_status(
-    cfg: &clientapi_pve::apis::configuration::Configuration,
+    creds: &Credentials,
     node: &str,
     vmid: i32,
-    expected: PveStatusEnum,
+    expected: &str,
     timeout_secs: u64,
 ) -> anyhow::Result<()> {
+    // Raw GET — see common/raw_status.rs for the SDK f64-string mismatch.
     wait_until(
-        &format!("vm {vmid} → {expected:?}"),
+        &format!("vm {vmid} → {expected}"),
         Duration::from_secs(timeout_secs),
         Duration::from_millis(500),
         || async {
-            let resp = qemu_api::qemu_vm_status(cfg, node, vmid)
+            let status = raw_status(creds, node, "qemu", vmid)
                 .await
                 .map_err(|e| anyhow::anyhow!("vm_status: {e}"))?;
-            if resp.data.status == expected {
+            if status == expected {
                 Ok(Some(()))
             } else {
                 Ok(None)
