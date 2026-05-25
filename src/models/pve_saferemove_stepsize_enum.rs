@@ -11,10 +11,10 @@
 use crate::models;
 use serde::{Deserialize, Serialize};
 
-use serde_repr::{Serialize_repr,Deserialize_repr};
+use serde_repr::Serialize_repr;
 /// 
 #[repr(i64)]
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize_repr, Deserialize_repr)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize_repr)]
 pub enum PveSaferemoveStepsizeEnum {
     Variant1 = 1,
     Variant2 = 2,
@@ -23,6 +23,37 @@ pub enum PveSaferemoveStepsizeEnum {
     Variant16 = 16,
     Variant32 = 32,
 
+}
+
+/// Custom deserializer for the wire-format zoo PVE (and PMG) leak from
+/// the Perl backend: integer enums can arrive as JSON numbers, as
+/// stringified numbers (`"1"`), or as booleans depending on which Perl
+/// JSON encoding path served the field. `serde_repr::Deserialize_repr`
+/// only accepts numbers, so it panics on the string variant.
+impl<'de> serde::Deserialize<'de> for PveSaferemoveStepsizeEnum {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        use serde::de::Error;
+        let value = serde_json::Value::deserialize(deserializer)?;
+        let n: i64 = match &value {
+            serde_json::Value::Number(num) => num
+                .as_i64()
+                .ok_or_else(|| D::Error::custom(format!("PveSaferemoveStepsizeEnum: expected i64, got {}", num)))?,
+            serde_json::Value::String(s) => s
+                .parse::<i64>()
+                .map_err(|e| D::Error::custom(format!("PveSaferemoveStepsizeEnum: invalid integer string {:?}: {}", s, e)))?,
+            serde_json::Value::Bool(b) => if *b { 1 } else { 0 },
+            other => return Err(D::Error::custom(format!("PveSaferemoveStepsizeEnum: expected integer, string, or bool; got {}", other))),
+        };
+        match n {
+            1 => Ok(Self::Variant1),
+            2 => Ok(Self::Variant2),
+            4 => Ok(Self::Variant4),
+            8 => Ok(Self::Variant8),
+            16 => Ok(Self::Variant16),
+            32 => Ok(Self::Variant32),
+            other => Err(D::Error::custom(format!("PveSaferemoveStepsizeEnum: invalid value {}", other))),
+        }
+    }
 }
 
 impl std::fmt::Display for PveSaferemoveStepsizeEnum {

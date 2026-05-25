@@ -13,8 +13,6 @@ use reqwest;
 use serde::{Deserialize, Serialize, de::Error as _};
 use crate::{apis::ResponseContent, models};
 use super::{Error, configuration, ContentType};
-use tokio::fs::File as TokioFile;
-use tokio_util::codec::{BytesCodec, FramedRead};
 
 
 /// struct for typed errors of method [`nodes_storage_copy`]
@@ -1461,10 +1459,11 @@ pub async fn nodes_storage_upload(configuration: &configuration::Configuration, 
         multipart_form = multipart_form.text("checksum-algorithm", serde_json::to_string(&param_value)?);
     }
     multipart_form = multipart_form.text("content", p_form_content.to_string());
-    let file = TokioFile::open(&p_form_filename).await?;
-    let stream = FramedRead::new(file, BytesCodec::new());
-    let file_name = p_form_filename.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
-    let file_part = reqwest::multipart::Part::stream(reqwest::Body::wrap_stream(stream)).file_name(file_name);
+    let bytes = tokio::fs::read(&p_form_filename).await?;
+    let file_name = p_form_filename.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_else(|| "upload".to_string());
+    let file_part = reqwest::multipart::Part::bytes(bytes)
+        .file_name(file_name)
+        .mime_str("application/octet-stream")?;
     multipart_form = multipart_form.part("filename", file_part);
     req_builder = req_builder.multipart(multipart_form);
 

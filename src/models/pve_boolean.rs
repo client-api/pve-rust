@@ -11,14 +11,41 @@
 use crate::models;
 use serde::{Deserialize, Serialize};
 
-use serde_repr::{Serialize_repr,Deserialize_repr};
+use serde_repr::Serialize_repr;
 /// 
 #[repr(i64)]
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize_repr, Deserialize_repr)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize_repr)]
 pub enum PveBoolean {
     Variant0 = 0,
     Variant1 = 1,
 
+}
+
+/// Custom deserializer for the wire-format zoo PVE (and PMG) leak from
+/// the Perl backend: integer enums can arrive as JSON numbers, as
+/// stringified numbers (`"1"`), or as booleans depending on which Perl
+/// JSON encoding path served the field. `serde_repr::Deserialize_repr`
+/// only accepts numbers, so it panics on the string variant.
+impl<'de> serde::Deserialize<'de> for PveBoolean {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        use serde::de::Error;
+        let value = serde_json::Value::deserialize(deserializer)?;
+        let n: i64 = match &value {
+            serde_json::Value::Number(num) => num
+                .as_i64()
+                .ok_or_else(|| D::Error::custom(format!("PveBoolean: expected i64, got {}", num)))?,
+            serde_json::Value::String(s) => s
+                .parse::<i64>()
+                .map_err(|e| D::Error::custom(format!("PveBoolean: invalid integer string {:?}: {}", s, e)))?,
+            serde_json::Value::Bool(b) => if *b { 1 } else { 0 },
+            other => return Err(D::Error::custom(format!("PveBoolean: expected integer, string, or bool; got {}", other))),
+        };
+        match n {
+            0 => Ok(Self::Variant0),
+            1 => Ok(Self::Variant1),
+            other => Err(D::Error::custom(format!("PveBoolean: invalid value {}", other))),
+        }
+    }
 }
 
 impl std::fmt::Display for PveBoolean {
