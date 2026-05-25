@@ -33,7 +33,10 @@ jobs:
           tag: '9.2'
 
       - name: Run E2E tests
-        run: cargo test --tests -- --nocapture
+        # --test-threads=1 serialises scenarios within each test binary so
+        # the shared cluster state (e2e-* users, ACLs, fixture VMs) is not
+        # racy. Each binary still runs in sequence by default.
+        run: cargo test --tests -- --nocapture --test-threads=1
         env:
           PROXMOX_KVM_AVAILABLE: ${{ steps.proxmox.outputs.kvm-available }}
           PROXMOX_CGROUPV2_AVAILABLE: ${{ steps.proxmox.outputs.cgroupv2-available }}

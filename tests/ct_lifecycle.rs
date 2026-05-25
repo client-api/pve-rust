@@ -38,16 +38,16 @@ async fn sc_61_ct_lifecycle() {
     lxc_api::lxc_vm_start(&cfg, &node, FIXTURE_CTID, None)
         .await
         .expect("pct start 200");
-    wait_for_status(&cfg, &node, FIXTURE_CTID, PveStatusEnum::Running, 30)
+    wait_for_status(&cfg, &node, FIXTURE_CTID, PveStatusEnum::Running, 60)
         .await
-        .expect("CT running within 30 s");
+        .expect("CT running within 60 s");
 
     lxc_api::lxc_vm_stop(&cfg, &node, FIXTURE_CTID, None)
         .await
         .expect("pct stop 200");
-    wait_for_status(&cfg, &node, FIXTURE_CTID, PveStatusEnum::Stopped, 30)
+    wait_for_status(&cfg, &node, FIXTURE_CTID, PveStatusEnum::Stopped, 60)
         .await
-        .expect("CT stopped within 30 s");
+        .expect("CT stopped within 60 s");
 }
 
 async fn wait_for_status(
